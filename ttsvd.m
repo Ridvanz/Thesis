@@ -1,10 +1,12 @@
 function [G, rk] = ttsvd(A,e)
 
+% Tensor Train decomposition with svd, given a tolerance e
+
 Sizes = size(A);
 d = ndims(A);
 delta = (e/(sqrt(d-1)));
 
-Atest = inproduct(A,A)
+Atest = inproduct(A,A);
 rk = zeros(d,1);
 G  = cell(d,1);
 rk(1)=1;

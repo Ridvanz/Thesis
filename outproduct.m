@@ -1,5 +1,7 @@
 function K=outproduct(varargin)
 
+%  Outer product of an arbitraty number of vectors
+
 if nargin==0
     error('Please input vectors');
 else

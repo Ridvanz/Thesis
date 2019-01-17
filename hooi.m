@@ -1,5 +1,7 @@
 function [G, A, error1, Xr] = hooi(X, A, R, e, maxiter)
 
+% Tucker Decomposition with truncation
+
 l = length(size(X));
 iter=0;
 error1= 1;

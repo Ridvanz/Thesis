@@ -1,5 +1,7 @@
 function [G, A, R] = hosvd(X)
 
+% High Order SVD, Tucker decomposition
+
 l = length(size(X));
 A = cell(l,1);
 G = X;
