@@ -1,4 +1,4 @@
-function [TN,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,difforder)
+function [TN,Vm,Vp,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,difforder)
 
 res1=[];
 res2=[];
@@ -77,10 +77,11 @@ while (itr < MAXITR )
         
 
         %Solve linear subsystem 
-%         g=pinv(AA + lambda*WWW)*(A'*zeta(dataselect,:));
-        
-       [g,~] = pcg((AA + lambda*WWW),(A'*zeta(dataselect,:)),1/nselect(itr),1000,[],[],TN.core{sweepindex}(:));
-        
+%         if itr>MAXITR-1
+             g=pinv(AA + lambda*WWW)*(A'*zeta(dataselect,:));
+%         else
+%             [g,~] = pcg((AA + lambda*WWW),(A'*zeta(dataselect,:)),1/nselect(itr),1000,[],[],TN.core{sweepindex}(:));
+%         end
         
         if ltr
 %             left-to-right sweep, generate left orthogonal cores and update Vm
