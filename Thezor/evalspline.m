@@ -23,24 +23,11 @@ for ii=1:Nt
 end
 end
 
-yhat=zeros(Nt,1);
-
-G = TN.core;
-
-for i = 1:length(G)
-Gsize = [Nt size(G{i},1)  size(G{i},3)];
-tempz = reshape(ut{i}*unfold(G{i},2), Gsize);
-V{i} = permute(tempz, [2 3 1]);
+yhat = ones(Nt,1);
+for i=1:size(TN.core,2)
+    yhat=dotkron(yhat,ut{i})*reshape(TN.core{i},[TN.sz(i,1)*TN.sz(i,2),TN.sz(i,3)]); 
 end
 
-for jj=1:Nt   
-f = (V{1});
-f=1;
-for i = 1:length(G)
-f = f*V{i}(:,:,jj);
-end
-yhat(jj)=f;
-end
 
 end
 

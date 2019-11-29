@@ -1,5 +1,15 @@
 function [Utrun,Strun,Vtrun,r] = trunsvd(C,e,Atest)
 
+%[Utrun,Strun,Vtrun,r] = trunsvd(C,e,Atest)
+% -------------
+% Performs a truncated svd on matrix C for a given error e
+% 
+% C         = Matrix
+% 
+% e         = error
+% 
+% Atest     = Norm of original tensor
+
 [U,S,V] = svd(C);
 sings = diag(S).^2;
 cumuls = cumsum(sings)/(Atest);

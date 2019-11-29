@@ -1,4 +1,4 @@
-function [TN,Vm,Vp,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,difforder)
+function [TN,Vm,Vp,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,gamma,difforder)
 
 res1=[];
 res2=[];
@@ -14,7 +14,7 @@ P = diff(eye(I(1)),difforder);
 PP = P'*P;
 
 tic
-while (itr-1 < (MAXITR))
+while (itr <= MAXITR )
 %     ---------------------updateTT-----------------;
         %Select random batch of data
         dataselect = randperm((N),nselect(itr));  
@@ -66,37 +66,35 @@ while (itr-1 < (MAXITR))
             W{p} = reshape(Wtemp, [prod(Dsize) prod(Dsize)]); 
         end
         
-     
+        AA = A'*A;
         
+%         WWW = trace(AA)/trace(W{1})*W{1};
+%         for s =2:d
+%             WWW = WWW + trace(AA)/trace(W{s})*W{s};
+%         end
+
         WWW = W{1};
         for s =2:d
             WWW = WWW + W{s};
         end
         
-        AA = A'*A;
-        
-%       D = eye(r(sweepindex)*(I(sweepindex))*r(sweepindex+1));         
-        VAR = (100/(N))*A'*ones((sweepindex)*(I(sweepindex))*r(sweepindex+1))*A;
+          VAR = (1/(N))*(A'*ones(nselect(itr),1))*(ones(1,nselect(itr))*A);
+          
         %Solve linear subsystem 
-%         if itr>MAXITR-1
-             g=pinv(AA - VAR + lambda*WWW)*(A'*zeta(dataselect,:));
-             
-%              g=pinv(AA + lambda*WWW)*(A'*zeta(dataselect,:));
-%         else
-%             [g,~] = pcg((AA + lambda*WWW),(A'*zeta(dataselect,:)),1/nselect(itr),1000,[],[],TN.core{sweepindex}(:));
-%         end
-        
+
+             g=pinv(AA - gamma*VAR  + lambda*WWW)*(A'*zeta(dataselect,:));
+
         if ltr
 %             left-to-right sweep, generate left orthogonal cores and update Vm
             [Q,R]=qr(reshape(g,[r(sweepindex)*(I(sweepindex)),r(sweepindex+1)])); 
             TN.core{sweepindex}=reshape(Q(:,1:r(sweepindex+1)),[r(sweepindex),I(sweepindex),r(sweepindex+1)]);
-%             TN.core{sweepindex+1}=reshape(R(1:r(sweepindex+1),:)*reshape(TN.core{sweepindex+1},[r(sweepindex+1),(I(sweepindex+1))*r(sweepindex+2)]),[r(sweepindex+1),I(sweepindex+1),r(sweepindex+2)]);
+            TN.core{sweepindex+1}=reshape(R(1:r(sweepindex+1),:)*reshape(TN.core{sweepindex+1},[r(sweepindex+1),(I(sweepindex+1))*r(sweepindex+2)]),[r(sweepindex+1),I(sweepindex+1),r(sweepindex+2)]);
             Vm{sweepindex+1}=dotkron(Vm{sweepindex},un{sweepindex})*reshape(TN.core{sweepindex},[r(sweepindex)*I(sweepindex),r(sweepindex+1)]); 
         else
 %             right-to-left sweep, generate right orthogonal cores and update Vp
             [Q,R]=qr(reshape(g,[r(sweepindex),(I(sweepindex))*r(sweepindex+1)])'); 
             TN.core{sweepindex}=reshape(Q(:,1:r(sweepindex))',[r(sweepindex),I(sweepindex),r(sweepindex+1)]);
-%             TN.core{sweepindex-1}=reshape(reshape(TN.core{sweepindex-1},[r(sweepindex-1)*(I(sweepindex-1)),r(sweepindex)])*R(1:r(sweepindex),:)',[r(sweepindex-1),I(sweepindex-1),r(sweepindex)]);
+            TN.core{sweepindex-1}=reshape(reshape(TN.core{sweepindex-1},[r(sweepindex-1)*(I(sweepindex-1)),r(sweepindex)])*R(1:r(sweepindex),:)',[r(sweepindex-1),I(sweepindex-1),r(sweepindex)]);
             Vp{sweepindex-1}=dotkron(Vp{sweepindex},un{sweepindex})*reshape(permute(TN.core{sweepindex},[3 2 1]),[r(sweepindex+1)*I(sweepindex),r(sweepindex)]);  
         end
     
@@ -120,14 +118,12 @@ while (itr-1 < (MAXITR))
         % only check residual after 1 half sweep
         if (sweepindex==d) || (sweepindex==1) % half a sweep
             
-            res1(itr)=norm(A*g-zeta(dataselect,:))^2/(nselect(itr)); % check residual (mean squared error)
-            res2(itr)=1*(g'*WWW*g);                                     % check residual
-            
-            
-            disp(["iteration:" itr timer])
-           
+            res1(itr)=norm(A*g-zeta(dataselect,:))^2/(nselect(itr)); % check residual
+            res2(itr)=1*(g'*WWW*g);
+
+%             disp(["iteration:" itr timer])
+%              disp(sweepindex)
             itr=itr+1; %update iteration
-            
         end   
 end  
 
