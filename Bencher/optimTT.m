@@ -1,4 +1,4 @@
-function [TN,Vm,Vp,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,gamma,difforder)
+function [TN,Vm,Vp,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,difforder)
 
 % [TN,Vm,Vp,res1,res2] = optimTT(TN,Vm,Vp,un,zeta,MAXITR,nselect,lambda,gamma,difforder)
 % -------------
@@ -61,7 +61,7 @@ while (itr <= MAXITR )
           
         %Solve linear subsystem 
 
-             g=pinv(A'*A + lambda*WWW)*(A'*zeta(dataselect,:));
+             g=pinv(A'*A + (nselect(itr)/N)*lambda*WWW)*(A'*zeta(dataselect,:));
 
         %Update cores
         if ltr
@@ -98,10 +98,10 @@ while (itr <= MAXITR )
         % only check residual after 1 half sweep
         if (sweepindex==d) || (sweepindex==1) % half a sweep
             
-            res1(itr)=norm(A*g-zeta(dataselect,:))^2/(nselect(itr)); % check residual
-            res2(itr)=lambda*(g'*WWW*g);
+            res1(itr)=norm(A*g-zeta(dataselect,:))^2; % check residual
+            res2(itr)=(nselect(itr)/N)*lambda*(g'*WWW*g);
 
-            disp(["iteration:" itr timer])
+%             disp(["iteration:" itr timer])
 %              disp(sweepindex)
             itr=itr+1; %update iteration
         end   

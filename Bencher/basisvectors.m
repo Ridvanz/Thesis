@@ -19,10 +19,11 @@ In= m+n;
 bs = bspline([0:n+1]);  %Generate b-spline model
 M = flipud(bs.coefs)';  %Get the basis Matrix of size (n+1, n+1)
 
-knotdist = 1/m;         %Get the distance between knots
+knotdist = 1/m;         %distance between knots
 
 indexes = floor(featurez/knotdist)+1;       %Calculate in which knot intervals the data samples fall.
 indexes(indexes>m)= m;                      %Correction for when a data sample equals the upper limit (one).    
+indexes(indexes<1)= 1;
 
 inputs = (featurez/knotdist)-indexes+1;     %Map the datapoints to the knot intervals.
 
