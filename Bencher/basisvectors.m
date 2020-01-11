@@ -15,9 +15,7 @@ function [un] = basisvectors(featurez,n,m)
 [N, d]=size(featurez); 
 
 In= m+n;
-
-bs = bspline([0:n+1]);  %Generate b-spline model
-M = flipud(bs.coefs)';  %Get the basis Matrix of size (n+1, n+1)
+M = basismat(n);
 
 knotdist = 1/m;         %distance between knots
 
