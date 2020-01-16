@@ -41,6 +41,11 @@ r = [TN.sz(:,1);1];
 P = diff(eye(I(1)),difforder);
 PP = P'*P;
 
+
+if isempty(nselect)
+    nselect = ones([1,MAXITR])*N;
+end
+
 tic
 while (itr <= MAXITR )
 %     ---------------------updateTT-----------------;
@@ -95,11 +100,11 @@ while (itr <= MAXITR )
                 end
     
     
-        % only check residual after 1 half sweep
+        % check residual after sweep
         if (sweepindex==d) || (sweepindex==1) % half a sweep
             
-            res1(itr)=norm(A*g-zeta(dataselect,:))^2; % check residual
-            res2(itr)=(nselect(itr)/N)*lambda*(g'*WWW*g);
+            res1(itr)=(1/nselect(itr))*norm(A*g-zeta(dataselect,:))^2; % check residual
+            res2(itr)=(1/N)*lambda*(g'*WWW*g);
 
 %             disp(["iteration:" itr timer])
 %              disp(sweepindex)
