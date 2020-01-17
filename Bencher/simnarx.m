@@ -4,9 +4,15 @@ function [simoutput] = simnarx(TN,input,output,inlags,outlags,n,m)
 % -------------
 % Construct basis vectors from data samples
 % 
-% un        =   B-spline basis vectors
+% TN        =   Tensor Train struct
 % 
-% featurez  = Matrix of training data, rows are samples, columns are different features
+% input  = input sequence
+% 
+% output  = output sequence
+% 
+% inlags = lags for the input
+% 
+% outlags = lags for the outlags
 % 
 % n         = degree of B-spline
 % 
